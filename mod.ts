@@ -1,4 +1,4 @@
-async function passOutput(args: string[]): Promise<string | undefined> {
+async function passOutput(args: string[]): Promise<string> {
   const command = Deno.run({
     cmd: ["pass", ...args],
     stdout: "piped",
@@ -7,26 +7,33 @@ async function passOutput(args: string[]): Promise<string | undefined> {
   });
   const status = await command.status();
   if (!status.success) {
-    return;
+    throw Error("Underlying 'pass' command exited unsuccessfully.");
   }
   const output = await command.output();
   return new TextDecoder().decode(output);
 }
 
 /**
- * Gets entire (trimmed) contents from the specified entry in the password store.
+ * Gets entire (trimmed) contents from the specified entry in the password
+ * store.
+ *
+ * Will throw if the entry does not exist.
  */
 export async function entryContents(
   entry: string,
-): Promise<string | undefined> {
-  return (await passOutput([entry]))?.trim();
+): Promise<string> {
+  return (await passOutput([entry])).trim();
 }
 
 /**
  * Gets the first non-empty line from the specified entry in the password store.
+ *
+ * This may result in an empty string depending on the format of the file.
+ *
+ * Will throw if the entry does not exist.
  */
-export async function passwordFor(entry: string): Promise<string | undefined> {
-  return (await passOutput([entry]))?.trim().split("\n")[0];
+export async function passwordFor(entry: string): Promise<string> {
+  return (await passOutput([entry])).trim().split("\n")[0];
 }
 
 /**
@@ -42,20 +49,21 @@ export async function passwordFor(entry: string): Promise<string | undefined> {
  * app_password:    abcd 1234 efgh 5678
  *
  * Then `fieldFor("google.com/personal", "app_password")` would return `abcd 1234 efgh 5678`.
+ *
+ * Will throw if the entry does not exist or the field cannot be found.
  */
 export async function fieldFor(
   entry: string,
   fieldName: string,
-): Promise<string | undefined> {
+): Promise<string> {
   const scan = `${fieldName}:`;
   const lines = (await passOutput([entry]))?.trim().split("\n");
-  if (lines === undefined) return;
   for (const line of lines) {
     if (line.trim().startsWith(scan)) {
       return line.substring(scan.length).trim();
     }
   }
-  return;
+  throw Error(`Could not find field '${fieldName}'`);
 }
 
 /*
