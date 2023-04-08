@@ -13,6 +13,8 @@ async function passOutput(args: string[]): Promise<string> {
   return new TextDecoder().decode(output);
 }
 
+export const _internals = { passOutput };
+
 /**
  * Gets entire (trimmed) contents from the specified entry in the password
  * store.
@@ -22,7 +24,7 @@ async function passOutput(args: string[]): Promise<string> {
 export async function entryContents(
   entry: string,
 ): Promise<string> {
-  return (await passOutput([entry])).trim();
+  return (await _internals.passOutput([entry])).trim();
 }
 
 /**
@@ -33,7 +35,7 @@ export async function entryContents(
  * Will throw if the entry does not exist.
  */
 export async function passwordFor(entry: string): Promise<string> {
-  return (await passOutput([entry])).trim().split("\n")[0];
+  return (await _internals.passOutput([entry])).trim().split("\n")[0];
 }
 
 /**
@@ -57,7 +59,7 @@ export async function fieldFor(
   fieldName: string,
 ): Promise<string> {
   const scan = `${fieldName}:`;
-  const lines = (await passOutput([entry]))?.trim().split("\n");
+  const lines = (await _internals.passOutput([entry]))?.trim().split("\n");
   for (const line of lines) {
     if (line.trim().startsWith(scan)) {
       return line.substring(scan.length).trim();
