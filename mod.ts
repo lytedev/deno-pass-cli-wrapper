@@ -56,10 +56,12 @@ export async function passwordFor(entry: string): Promise<string> {
  *
  * For example, if you run `pass google.com/personal` and get the following output:
  *
+ * ```
  * hunter2
  * username: johnsmith
  * full_email:johnsmith@gmail.com
  * app_password:    abcd 1234 efgh 5678
+ * ```
  *
  * Then `fieldFor("google.com/personal", "app_password")` would return `abcd 1234 efgh 5678`.
  *
