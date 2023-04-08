@@ -18,8 +18,7 @@ export const _internals = { passOutput };
 /**
  * Gets entire (trimmed) contents from the specified entry in the password
  * store.
- *
- * Will throw if the entry does not exist.
+ * @throws {Error} if `entry` does not exist
  */
 export async function entryContents(
   entry: string,
@@ -29,10 +28,8 @@ export async function entryContents(
 
 /**
  * Gets the first non-empty line from the specified entry in the password store.
- *
  * This may result in an empty string depending on the format of the file.
- *
- * Will throw if the entry does not exist.
+ * @throws {Error} if `entry` does not exist
  */
 export async function passwordFor(entry: string): Promise<string> {
   return (await _internals.passOutput([entry])).trim().split("\n")[0];
@@ -51,8 +48,7 @@ export async function passwordFor(entry: string): Promise<string> {
  * app_password:    abcd 1234 efgh 5678
  *
  * Then `fieldFor("google.com/personal", "app_password")` would return `abcd 1234 efgh 5678`.
- *
- * Will throw if the entry does not exist or the field cannot be found.
+ * @throws {Error} if `entry` does not exist
  */
 export async function fieldFor(
   entry: string,
