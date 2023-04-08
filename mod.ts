@@ -65,8 +65,8 @@ export async function passwordFor(entry: string): Promise<string> {
  *
  * Then `fieldFor("google.com/personal", "app_password")` would return `abcd 1234 efgh 5678`.
  *
- * If `entry` does not exist, an `{@link EntryNotFoundError}` is thrown.
- * If `field` cannot be found in the entry, a `{@link FieldNotFoundError}` is thrown.
+ * If `entry` does not exist, an {@link `EntryNotFoundError`} is thrown.
+ * If `field` cannot be found in the entry, a {@link `FieldNotFoundError`} is thrown.
  */
 export async function fieldFor(
   entry: string,
