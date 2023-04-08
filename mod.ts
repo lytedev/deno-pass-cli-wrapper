@@ -19,7 +19,7 @@ export class FieldNotFoundError extends Error {
 /**
  * Gets entire (trimmed) contents of `entry` in the password store.
  *
- * If `entry` does not exist, an `EntryNotFoundError` is thrown.
+ * If `entry` does not exist, an `{@link EntryNotFoundError}` is thrown.
  */
 export async function entryContents(
   entry: string,
@@ -43,7 +43,7 @@ export const _internals = { entryContents };
  * Gets the first non-empty line from the specified entry in the password store.
  * This may result in an empty string depending on the format of the file.
  *
- * If `entry` does not exist, an `EntryNotFoundError` is thrown.
+ * If `entry` does not exist, an `{@link EntryNotFoundError}` is thrown.
  */
 export async function passwordFor(entry: string): Promise<string> {
   return (await _internals.entryContents(entry)).trim().split("\n")[0];
@@ -51,7 +51,7 @@ export async function passwordFor(entry: string): Promise<string> {
 
 /**
  * Equivalent to retrieving the contents and looking for a line that starts with
- * `${fieldName}:` (the fieldName argument followed by a colon). The remainder
+ * `${field}:` (the `field` argument followed by a colon). The remainder
  * of the line (everything after the first colon) will be trimmed and returned.
  *
  * For example, if you run `pass google.com/personal` and get the following output:
@@ -65,8 +65,8 @@ export async function passwordFor(entry: string): Promise<string> {
  *
  * Then `fieldFor("google.com/personal", "app_password")` would return `abcd 1234 efgh 5678`.
  *
- * If `entry` does not exist, an `EntryNotFoundError` is thrown.
- * If {@link field} cannot be found in the entry, a {@link FieldNotFoundError} is thrown.
+ * If `entry` does not exist, an `{@link EntryNotFoundError}` is thrown.
+ * If `field` cannot be found in the entry, a `{@link FieldNotFoundError}` is thrown.
  */
 export async function fieldFor(
   entry: string,
