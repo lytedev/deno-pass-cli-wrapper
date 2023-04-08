@@ -19,7 +19,7 @@ export class FieldNotFoundError extends Error {
 /**
  * Gets entire (trimmed) contents of `entry` in the password store.
  *
- * If `entry` does not exist, a `EntryNotFoundError` is thrown.
+ * If `entry` does not exist, an `EntryNotFoundError` is thrown.
  */
 export async function entryContents(
   entry: string,
@@ -43,7 +43,7 @@ export const _internals = { entryContents };
  * Gets the first non-empty line from the specified entry in the password store.
  * This may result in an empty string depending on the format of the file.
  *
- * If `entry` does not exist, a `EntryNotFoundError` is thrown.
+ * If `entry` does not exist, an `EntryNotFoundError` is thrown.
  */
 export async function passwordFor(entry: string): Promise<string> {
   return (await _internals.entryContents(entry)).trim().split("\n")[0];
@@ -63,7 +63,7 @@ export async function passwordFor(entry: string): Promise<string> {
  *
  * Then `fieldFor("google.com/personal", "app_password")` would return `abcd 1234 efgh 5678`.
  *
- * If `entry` does not exist, a `EntryNotFoundError` is thrown.
+ * If `entry` does not exist, a n`EntryNotFoundError` is thrown.
  * If `field` cannot be found in the entry, a `FieldNotFoundError` is thrown.
  */
 export async function fieldFor(
