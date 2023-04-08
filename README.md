@@ -1,3 +1,5 @@
+# pass_cli_wrapper for Deno
+
 # Usage
 
 Please refer to the automated documentation:
@@ -14,4 +16,16 @@ Or if you need a particular version, you can specify it like so:
 
 ```bash
 deno task setup-pre-commit
+```
+
+## Run CI Locally
+
+```bash
+deno task ci
+```
+
+## Format Code
+
+```bash
+deno task fix
 ```
