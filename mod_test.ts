@@ -3,7 +3,13 @@ import {
   assertRejects,
 } from "https://deno.land/std@0.181.0/testing/asserts.ts";
 import { stub } from "https://deno.land/std@0.181.0/testing/mock.ts";
-import { _internals, entryContents, fieldFor, passwordFor } from "./mod.ts";
+import {
+  _internals,
+  EntryNotFoundError,
+  fieldFor,
+  FieldNotFoundError,
+  passwordFor,
+} from "./mod.ts";
 
 Deno.test("string processing and throws", async () => {
   const entries: Record<string, string> = {
@@ -18,42 +24,38 @@ full_email:johnsmith@gmail.com
 app_password:    abcd 1234 efgh 5678`,
   };
 
-  stub(_internals, "passOutput", ([entry]) => {
+  stub(_internals, "entryContents", (entry: string) => {
     if (entry in entries) {
       return Promise.resolve(entries[entry]);
     }
-    throw new Error("Mocked pass throw");
+    return Promise.reject(new EntryNotFoundError(entry));
   });
 
   assertEquals(await fieldFor("google.com/personal", "username"), "johnsmith");
   assertEquals(
-    await entryContents("google.com/personal"),
+    await _internals.entryContents("google.com/personal"),
     entries["google.com/personal"],
   );
   assertEquals(await passwordFor("google.com/personal"), "hunter2");
   assertEquals(await passwordFor("weirdly-formatted"), "username: johnsmith");
 
   assertRejects(
-    () => entryContents("404-not-found"),
-    Error,
-    "Mocked pass throw",
+    () => _internals.entryContents("404-not-found"),
+    EntryNotFoundError,
   );
 
   assertRejects(
-    () => entryContents("404-not-found"),
-    Error,
-    "Mocked pass throw",
+    () => _internals.entryContents("404-not-found"),
+    EntryNotFoundError,
   );
 
   assertRejects(
     () => fieldFor("404-not-found", "404-not-found"),
-    Error,
-    "Mocked pass throw",
+    EntryNotFoundError,
   );
 
   assertRejects(
     () => fieldFor("weirdly-formatted", "404-not-found"),
-    Error,
-    "Could not find field '404-not-found'",
+    FieldNotFoundError,
   );
 });

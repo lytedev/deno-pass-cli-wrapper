@@ -1,38 +1,52 @@
-async function passOutput(args: string[]): Promise<string> {
+export class EntryNotFoundError extends Error {
+  constructor(entry: string, options?: ErrorOptions) {
+    super(
+      `Entry '${entry}' caused underlying 'pass' command to exit unsuccessfully`,
+      options,
+    );
+  }
+}
+
+export class FieldNotFoundError extends Error {
+  constructor(entry: string, field: string, options?: ErrorOptions) {
+    super(
+      `Could not find field '${field}' in entry '${entry}'`,
+      options,
+    );
+  }
+}
+
+/**
+ * Gets entire (trimmed) contents of `entry` in the password store.
+ *
+ * If `entry` does not exist, a `EntryNotFoundError` is thrown.
+ */
+export async function entryContents(
+  entry: string,
+): Promise<string> {
   const command = Deno.run({
-    cmd: ["pass", ...args],
+    cmd: ["pass", entry],
     stdout: "piped",
     stdin: "null",
     stderr: "null",
   });
   const status = await command.status();
   if (!status.success) {
-    throw Error("Underlying 'pass' command exited unsuccessfully.");
+    throw new EntryNotFoundError(entry);
   }
-  const output = await command.output();
-  return new TextDecoder().decode(output);
+  return new TextDecoder().decode(await command.output());
 }
 
-export const _internals = { passOutput };
-
-/**
- * Gets entire (trimmed) contents from the specified entry in the password
- * store.
- * @throws {Error} if `entry` does not exist
- */
-export async function entryContents(
-  entry: string,
-): Promise<string> {
-  return (await _internals.passOutput([entry])).trim();
-}
+export const _internals = { entryContents };
 
 /**
  * Gets the first non-empty line from the specified entry in the password store.
  * This may result in an empty string depending on the format of the file.
- * @throws {Error} if `entry` does not exist
+ *
+ * If `entry` does not exist, a `EntryNotFoundError` is thrown.
  */
 export async function passwordFor(entry: string): Promise<string> {
-  return (await _internals.passOutput([entry])).trim().split("\n")[0];
+  return (await _internals.entryContents(entry)).trim().split("\n")[0];
 }
 
 /**
@@ -48,46 +62,20 @@ export async function passwordFor(entry: string): Promise<string> {
  * app_password:    abcd 1234 efgh 5678
  *
  * Then `fieldFor("google.com/personal", "app_password")` would return `abcd 1234 efgh 5678`.
- * @throws {Error} if `entry` does not exist
+ *
+ * If `entry` does not exist, a `EntryNotFoundError` is thrown.
+ * If `field` cannot be found in the entry, a `FieldNotFoundError` is thrown.
  */
 export async function fieldFor(
   entry: string,
-  fieldName: string,
+  field: string,
 ): Promise<string> {
-  const scan = `${fieldName}:`;
-  const lines = (await _internals.passOutput([entry]))?.trim().split("\n");
+  const scan = `${field}:`;
+  const lines = (await _internals.entryContents(entry))?.trim().split("\n");
   for (const line of lines) {
     if (line.trim().startsWith(scan)) {
       return line.substring(scan.length).trim();
     }
   }
-  throw Error(`Could not find field '${fieldName}'`);
+  throw new FieldNotFoundError(entry, field);
 }
-
-/*
-// Maybe someday we'll get fancy!
-
-export class InvocationResult {
-  constructor(opts,
-}
-
-export type FileDescriptor = "inherit" | "piped" | "null" | number;
-
-export interface InvokeInit {
-  args?: string[],
-  stdout?: FileDescriptor,
-  stderr?: FileDescriptor,
-  stdin?: FileDescriptor,
-}
-
-export async function rawInvoke(opts: InvokeInit): Promise<InvocationResult> {
-  const { args, stdout, stderr, stdin } = opts;
-  const run = Deno.run({
-    cmd: ["pass"].concat(args || []),
-    stdout: stdout || "piped",
-    stdin: stdin || "null",
-    stderr: stderr || "piped",
-  });
-  return new InvocationResult(opts, run.status(), run.stdout, run.stderr);
-}
-*/
