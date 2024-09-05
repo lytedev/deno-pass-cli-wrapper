@@ -1,4 +1,7 @@
 {
+  "name": "@lytedev/pass-cli-wrapper",
+  "version": "0.3.2",
+  "exports": "./mod.ts",
   "tasks": {
     "fix": "deno fmt",
     "ci": "deno fmt --check && deno lint && deno check $(git ls-files | grep -E '.m?ts$') && deno test --allow-all",
