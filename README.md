@@ -4,11 +4,11 @@
 
 Please refer to the automated documentation:
 
-- https://deno.land/x/pass_cli_wrapper/mod.ts
+- https://jsr.io/@lytedev/pass-cli-wrapper/doc
 
 Or if you need a particular version, you can specify it like so:
 
-- https://deno.land/x/pass_cli_wrapper@0.1.0/mod.ts
+- https://jsr.io/@lytedev/pass-cli-wrapper@0.3.2/doc
 
 # Development
 
