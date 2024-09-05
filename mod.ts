@@ -24,17 +24,17 @@ export class FieldNotFoundError extends Error {
 export async function entryContents(
   entry: string,
 ): Promise<string> {
-  const command = Deno.run({
-    cmd: ["pass", entry],
+  const command = new Deno.Command("pass", {
+    args: [entry],
     stdout: "piped",
     stdin: "null",
     stderr: "null",
   });
-  const status = await command.status();
-  if (!status.success) {
+  const output = await command.output();
+  if (!output.success) {
     throw new EntryNotFoundError(entry);
   }
-  return new TextDecoder().decode(await command.output());
+  return new TextDecoder().decode(output.stdout);
 }
 
 export const _internals = { entryContents };
